@@ -6,7 +6,7 @@ def create_app(config_setting):
 
     app = Flask(__name__)
 
-    config_module = f'application.config.{config_setting.capitalize()}Config'
+    config_module = f'config.{config_setting.capitalize()}Config'
 
     app.config.from_object(config_module)
 
