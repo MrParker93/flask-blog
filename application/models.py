@@ -1,6 +1,6 @@
-from app import db
+from application import db
 from datetime import datetime
-
+from sqlalchemy.ext.associationproxy import association_proxy
 
 
 # Create database tables
@@ -10,8 +10,20 @@ class User(db.Model):
     username = db.Column(db.String(30), unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)
     created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    posts = db.relationship('Post', backref='user', lazy=True)
-    comments = db.relationship('Comment', backref='user', lazy=True)
+
+    user_comments = db.relationship('Comment', cascade='all, delete-orphan',
+                                backref='user')
+
+    comments = association_proxy('user_comments', 'user')
+
+    # def __init__(self, username, password, **kwargs):
+    #     super(User, self).__init__(**kwargs)
+    #     self.username = username
+    #     self.password = password
+
+    def __repr__(self):
+        return '<User(id="%d", username="%s", password="%s", posts="%s")>' %\
+                 (self.id, self.username, self.password, self.posts)
 
     def verify_password(self, password) -> bool:
         """
@@ -51,8 +63,15 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     published = db.Column(db.Boolean, index=True)
     created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
-    comments = db.relationship('Comment', backref='post', lazy=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    comments_on_post = db.relationship('Comment', cascade='all, delete-orphan',
+                                       backref='post')
+                            
+    comments = association_proxy('comments_on_post', 'post')
+
+    def __repr__(self):
+        return '<Post(id="%d", title="%s", slug="%s", content="%s", user_id="%d")>' \
+            % (self.id, self.title, self.slug, self.content, self.user_id)
 
     def publish(self, *args, **kwargs):
         """
@@ -85,10 +104,30 @@ class Post(db.Model):
 
 class Comment(db.Model):
     __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True)    
+    user_id = db.Column(db.Integer, 
+                        db.ForeignKey('users.id',
+                                       ondelete='CASCADE',
+                                       onupdate='CASCADE'),
+                        primary_key=True)
+    post_id = db.Column(db.Integer,
+                        db.ForeignKey('posts.id',
+                                       ondelete='CASCADE',
+                                       onupdate='CASCADE'),
+                        primary_key=True)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow,
+                        index=True)
     content = db.Column(db.Text)
-    user_id = db.Column(db.ForeignKey('user.id'), primary_key=True, nullable=False)
-    post_id = db.Column(db.ForeignKey('post.id'), primary_key=True, nullable=False)
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+
+    def __init__(self, user, post, content=None, **kwargs):
+        super(Comment, self).__init__(**kwargs)
+        self.user_id = user.id
+        self.post_id = post.id
+        self.content = content
+
+    def __repr__(self):
+        return '<Comment(id="%d", content="%s", user_id="%d", post_id="%d")>'\
+            % (self.id, self.content, self.user_id, self.post_id)
 
     def comment(self):
         """

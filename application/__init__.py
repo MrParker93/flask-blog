@@ -13,7 +13,7 @@ def create_app(config_setting):
     app.config.from_object(config_module)
 
     with app.app_context():
-        db.__init__(app)
+        db.init_app(app)
 
     @app.route('/')
     def hello_world():
