@@ -1,20 +1,35 @@
 from application import db
 from datetime import datetime
-from sqlalchemy.ext.associationproxy import association_proxy
+# from sqlalchemy.ext.associationproxy import association_proxy
+# from sqlalchemy.schema import Table
+
+
+# post_comments = Table('comments', db.metadata,
+#                 db.Column('user_id',
+#                           db.Integer,
+#                           db.ForeignKey('users.id',
+#                                         ondelete='CASCADE',
+#                                         onupdate='CASCADE'),
+#                           primary_key=True
+#                     ),
+#                 db.Column('post_id',
+#                           db.Integer,
+#                           db.ForeignKey('posts.id',
+#                                         ondelete='CASCADE',
+#                                         onupdate='CASCADE'),
+#                           primary_key=True
+#                     ))
 
 
 # Create database tables
 class User(db.Model):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(30), unique=True, nullable=False)
-    password = db.Column(db.Text, nullable=False)
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-    user_comments = db.relationship('Comment', cascade='all, delete-orphan',
-                                backref='user')
-
-    comments = association_proxy('user_comments', 'user')
+    id = db.Column('id', db.Integer, primary_key=True)
+    username = db.Column('username', db.String(30), unique=True, nullable=False)
+    password = db.Column('password', db.Text, nullable=False)
+    created = db.Column('created', db.DateTime, nullable=False, default=datetime.utcnow)
+    posts = db.relationship('Post', back_populates='user',
+                cascade='all, delete, delete-orphan')
 
     # def __init__(self, username, password, **kwargs):
     #     super(User, self).__init__(**kwargs)
@@ -57,17 +72,15 @@ class User(db.Model):
 
 class Post(db.Model):
     __tablename__ = 'posts'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(80), nullable=False)
-    slug = db.Column(db.String(80), unique=True)
-    content = db.Column(db.Text, nullable=False)
-    published = db.Column(db.Boolean, index=True)
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
-
-    comments_on_post = db.relationship('Comment', cascade='all, delete-orphan',
-                                       backref='post')
-                            
-    comments = association_proxy('comments_on_post', 'post')
+    id = db.Column('id', db.Integer, primary_key=True)
+    title = db.Column('title', db.String(80), nullable=False)
+    slug = db.Column('slug', db.String(80), unique=True)
+    content = db.Column('content', db.Text, nullable=False)
+    published = db.Column('published', db.Boolean, index=True)
+    created = db.Column('created', db.DateTime, nullable=False,
+                    default=datetime.utcnow, index=True)
+    user_id = db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User', back_populates='posts')
 
     def __repr__(self):
         return '<Post(id="%d", title="%s", slug="%s", content="%s", user_id="%d")>' \
@@ -102,49 +115,46 @@ class Post(db.Model):
         pass
 
 
-class Comment(db.Model):
-    __tablename__ = 'comments'
-    id = db.Column(db.Integer, primary_key=True)    
-    user_id = db.Column(db.Integer, 
-                        db.ForeignKey('users.id',
-                                       ondelete='CASCADE',
-                                       onupdate='CASCADE'),
-                        primary_key=True)
-    post_id = db.Column(db.Integer,
-                        db.ForeignKey('posts.id',
-                                       ondelete='CASCADE',
-                                       onupdate='CASCADE'),
-                        primary_key=True)
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow,
-                        index=True)
-    content = db.Column(db.Text)
+# class Comment(db.Model):
+#     __tablename__ = 'comments'
+#     user_id = db.Column(db.Integer, 
+#                         db.ForeignKey('users.id',
+#                                        ondelete='CASCADE',
+#                                        onupdate='CASCADE'),
+#                         primary_key=True)
+#     post_id = db.Column(db.Integer,
+#                         db.ForeignKey('posts.id',
+#                                        ondelete='CASCADE',
+#                                        onupdate='CASCADE'),
+#                         primary_key=True)
+#     created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow,
+#                         index=True)
+#     content = db.Column(db.Text, nullable=False)
 
-    def __init__(self, user, post, content=None, **kwargs):
-        super(Comment, self).__init__(**kwargs)
-        self.user_id = user.id
-        self.post_id = post.id
-        self.content = content
+#     def __init__(self, content=None, **kwargs):
+#         super(Comment, self).__init__(**kwargs)
+#         self.content = content
 
-    def __repr__(self):
-        return '<Comment(id="%d", content="%s", user_id="%d", post_id="%d")>'\
-            % (self.id, self.content, self.user_id, self.post_id)
+#     def __repr__(self):
+#         return '<Comment(content="%s", user_id="%d", post_id="%d")>'\
+#             % (self.content, self.user_id, self.post_id)
 
-    def comment(self):
-        """
-        Posts a comment under a blog post.
-        """
-        pass
+#     def comment(self):
+#         """
+#         Posts a comment under a blog post.
+#         """
+#         pass
 
-    @classmethod
-    def edit_comment(self):
-        """
-        Edit the current selected comment.
-        """
-        pass
+#     @classmethod
+#     def edit_comment(self):
+#         """
+#         Edit the current selected comment.
+#         """
+#         pass
 
-    @classmethod
-    def delete_comment(self):
-        """
-        Delete the current selected comment.
-        """
-        pass
+#     @classmethod
+#     def delete_comment(self):
+#         """
+#         Delete the current selected comment.
+#         """
+#         pass

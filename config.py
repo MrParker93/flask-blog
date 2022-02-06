@@ -14,6 +14,7 @@ class Config:
 
     TESTING = False
     SECRET_KEY = os.getenv('SECRET_KEY')
+    TEMPLATES_AUTO_RELOAD = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class ProductionConfig(Config):
