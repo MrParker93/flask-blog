@@ -1,31 +1,12 @@
 import functools
-from .models import db, User, Post
+from .models import db, User
 from sqlalchemy.exc import IntegrityError
+
+from flask_login import login_user, logout_user, login_required
 from flask import Blueprint, flash, redirect, render_template, request,\
             session, url_for, make_response, g
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
-
-# Ensures current user's data is loaded before each request
-@bp.before_app_request
-def load_logged_in_user():
-    user_id = session.get('user_id')
-
-    if user_id is None:
-        g.user = None
-    else:
-        g.user = User.query.filter(
-            User.id == user_id).first()
-
-# Decorator to check login authentication
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(*args, **kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
-        
-        return view(*args, **kwargs)
-    return wrapped_view
 
 # Handles user registration
 @bp.route('/register', methods=['GET', 'POST'])
@@ -68,17 +49,17 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        remember_session = True if request.form.get('remember') else False
 
-        if username:
+        if username and password:
 
             # Query the users table and checks if username exists
-            user = User.query.filter_by(username=username).first()
+            user = User.query.filter_by(username=username).first_or_404()
 
             if user.verify_password(password):
                 flash('Successfully logged in.', 'success')
-                session.clear()
-                session['user_id'] = user.id
-                return redirect(url_for('index'))
+                login_user(user, remember=remember_session)
+                return redirect(url_for('main.profile'))
             else:
                 flash('Incorrect username or password', 'danger')
 
@@ -95,6 +76,8 @@ def login():
 
 # Handles user logout
 @bp.route('/logout')
+@login_required
 def logout():
-    session.clear()
-    return redirect(url_for('index'))
+    logout_user()
+    return redirect(url_for('main.index'))
+

@@ -1,8 +1,8 @@
 from application import db
 from datetime import datetime
 from application import _bcrypt as bc
+from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
-
 
 # post_comments = Table('comments', db.metadata,
 #                 db.Column('user_id',
@@ -22,7 +22,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 
 # Create database tables
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column('id', db.Integer, primary_key=True)
     username = db.Column('username', db.String(30), unique=True, nullable=False)
