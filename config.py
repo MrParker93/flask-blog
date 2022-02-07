@@ -14,7 +14,6 @@ class Config:
 
     TESTING = False
     SECRET_KEY = os.getenv('SECRET_KEY')
-    TEMPLATES_AUTO_RELOAD = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class ProductionConfig(Config):
@@ -27,6 +26,8 @@ class DevelopmentConfig(Config):
 
     FLASK_ENV = 'development'
     DATABASE = 'blog.db'
+    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_RECORD_QUERIES = True
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI') + DATABASE
 
 

@@ -1,9 +1,6 @@
-import bcrypt
 import functools
 from .models import db, User, Post
-from sqlite3 import IntegrityError
-from datetime import datetime as dt
-from flask import current_app as app
+from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, flash, redirect, render_template, request,\
             session, url_for, make_response, g
 
@@ -49,14 +46,10 @@ def register():
         
         if error is None:
             try:
-                # Convert str to bytes to enable password hash
-                password = bytes(password, 'UTF-8')
-                hashed_password = bcrypt.hashpw(password, bcrypt.gensalt(12))
-
                 # Adds a new user to the database
                 new_user = User(
                     username=username,
-                    password=hashed_password,
+                    password=password,
                 )
 
                 db.session.add(new_user)
@@ -65,7 +58,7 @@ def register():
                 return redirect(url_for('auth.login'))
 
             except IntegrityError:
-                flash('Username already taken. Please use a different one', 'danger')
+                flash('Username already exists. Please use a different one', 'danger')
     
     return render_template('auth/register.html')
 
@@ -76,31 +69,27 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        if username and password:
-            hashed_password = bcrypt.hashpw(
-                bytes(password, 'UTF-8'), bcrypt.gensalt(12))
+        if username:
 
             # Query the users table and checks if username exists
-            current_user = User.query.filter(
-                (User.username == username) & (User.password == bcrypt.checkpw(password, hashed_password))
-            ).first()
-            
-            if current_user:
+            user = User.query.filter_by(username=username).first()
+
+            if user.verify_password(password):
                 flash('Successfully logged in.', 'success')
                 session.clear()
-                session['user_id'] = current_user.scalar().id
+                session['user_id'] = user.id
                 return redirect(url_for('index'))
             else:
                 flash('Incorrect username or password', 'danger')
 
         elif not username and password:
-            flash('Missing field: Username')
+            flash('Missing field: Username', 'danger')
 
         elif username and not password:
-            flash('Missing field: Password')
+            flash('Missing field: Password', 'danger')
 
         else:
-            flash('Missing fields: Username and Password')
+            flash('Missing fields: Username and Password', 'danger')
     
     return render_template('auth/login.html')
 

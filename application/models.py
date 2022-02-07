@@ -1,7 +1,7 @@
 from application import db
 from datetime import datetime
-# from sqlalchemy.ext.associationproxy import association_proxy
-# from sqlalchemy.schema import Table
+from application import _bcrypt as bc
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 # post_comments = Table('comments', db.metadata,
@@ -26,15 +26,27 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column('id', db.Integer, primary_key=True)
     username = db.Column('username', db.String(30), unique=True, nullable=False)
-    password = db.Column('password', db.Text, nullable=False)
+    _password = db.Column('password', db.Text, nullable=False)
     created = db.Column('created', db.DateTime, nullable=False, default=datetime.utcnow)
     posts = db.relationship('Post', back_populates='user',
                 cascade='all, delete, delete-orphan')
 
-    # def __init__(self, username, password, **kwargs):
-    #     super(User, self).__init__(**kwargs)
-    #     self.username = username
-    #     self.password = password
+    @hybrid_property
+    def password(self):
+        """
+        Property of the User class used to define different
+        functions called from the same interface.
+        """
+        return self._password
+
+    @password.setter
+    def password(self, password) -> None:
+        """
+        Receives the password entered by the user as a string and
+        converts it to bytes before passing it through the hash function.
+        Stores the hashed password.
+        """
+        self._password = bc.generate_password_hash(password, rounds=12)
 
     def __repr__(self):
         return '<User(id="%d", username="%s", password="%s", posts="%s")>' %\
@@ -47,7 +59,7 @@ class User(db.Model):
         :param password: str
         :return: bool
         """
-        pass
+        return bc.check_password_hash(self._password, password)
 
     def change_username(self, username, new_username, password) -> str:
         """
