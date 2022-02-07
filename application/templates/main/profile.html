@@ -1,10 +1,40 @@
 {% extends "base.html" %}
 
+{% block title %}Profile{% endblock %}
+
+{% block header %}
+    {% if current_user.is_authentication %}
+        <a href="{{ url_for('main.create') }}">Create a post</a>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
-<h1 class="title">
-  Welcome, {{ username }}!
-</h1>
-<h2 class="subtitle">
-  Create your first blog post
-</h2>
+    <h1 class="title">
+        Welcome, {{ username }}!
+    </h1>
+    {% if posts %}
+        {% for post in posts %}
+            <div class="card">
+                <header class="message-header">
+                    <h2 class="card-header-title">
+                        {{ post.title }}
+                    </h2>
+                </header>
+                <div class="card-content">
+                    <div class="content">
+                        <p>{{ post.content }}</p>
+                        <br>
+                        <p>Posted by {{ username.capitalize() }} on {{ post.created.strftime('%d/%m/%Y')}}</p>
+                    </div>
+                    <footer class="card-footer">
+                        <a href="#" class="card-footer-item">Read</a>
+                        {% if current_user.id == post.user_id %}
+                            <a href="#" class="card-footer-item">Edit</a>
+                            <a href="#" class="card-footer-item">Delete</a>
+                        {% endif %}
+                    </footer>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
 {% endblock %}

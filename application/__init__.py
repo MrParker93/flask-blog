@@ -40,7 +40,7 @@ def create_app(config_setting):
         def load_user(user_id):
             return User.query.get(int(user_id))
 
-        @app.route('/hello', methods=['GET'])
+        @app.route('/', methods=['GET'])
         def hello():
             return render_template('hello.html')
     return app

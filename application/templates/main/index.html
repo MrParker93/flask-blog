@@ -1,10 +1,31 @@
 {% extends "base.html" %}
 
+{% block title %}Home{% endblock %}
+
 {% block content %}
 <h1 class="title">
-  Hello, World!
+    Welcome!
 </h1>
 <h2 class="subtitle">
-  Base template!
+    {% if not current_user.is_authenticated %}
+        Create your first blog post
+    {% endif %}
 </h2>
+    {% for post in posts %}
+        <div class="card">
+            <header class="card-header">
+                <h2 class="card-header-title">
+                    {{ post.title }}
+                </h2>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <p>{{ post.content }}</p>
+                </div>
+                <footer class="card-footer">
+                    <a href="#" class="card-footer-item">Read</a>
+                </footer>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}

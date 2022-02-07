@@ -36,10 +36,12 @@ def register():
                 db.session.add(new_user)
                 db.session.commit()
                 flash('Successfully created an account', 'success')
-                return redirect(url_for('auth.login'))
 
             except IntegrityError:
                 flash('Username already exists. Please use a different one', 'danger')
+            else:
+                return redirect(url_for('auth.login'))
+
     
     return render_template('auth/register.html')
 
@@ -54,7 +56,8 @@ def login():
         if username and password:
 
             # Query the users table and checks if username exists
-            user = User.query.filter_by(username=username).first_or_404()
+            user = User.query.filter_by(username=username).first_or_404(
+                description=f'Account with username: {username} not found.')
 
             if user.verify_password(password):
                 flash('Successfully logged in.', 'success')

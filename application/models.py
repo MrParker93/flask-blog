@@ -1,3 +1,4 @@
+import re
 from application import db
 from datetime import datetime
 from application import _bcrypt as bc
@@ -86,7 +87,7 @@ class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column('id', db.Integer, primary_key=True)
     title = db.Column('title', db.String(80), nullable=False)
-    slug = db.Column('slug', db.String(80), unique=True)
+    _slug = db.Column('slug', db.String(80), unique=True)
     content = db.Column('content', db.Text, nullable=False)
     published = db.Column('published', db.Boolean, index=True)
     created = db.Column('created', db.DateTime, nullable=False,
@@ -104,7 +105,16 @@ class Post(db.Model):
         the post else, save it as a draft to be published.
         """
         pass
+    
+    @hybrid_property
+    def slug(self):
+        return self._slug
 
+    @slug.setter
+    def slug(self, *args, **kwargs):
+        """Generate a URL-friendly representation of the post title."""
+        self._slug = re.sub(r'[^\w]+', '-', self.title.lower()).strip('-')
+        
     @classmethod
     def published_posts(cls):
         """
