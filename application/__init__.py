@@ -7,21 +7,22 @@ db = SQLAlchemy()
 _bcrypt = Bcrypt()
 login_manager = LoginManager()
 
+
 def create_app(config_setting):
     """Construct the core application."""
     app = Flask(__name__)
 
     # Sets app configuration based on FLASK_ENV value
-    config_module = f'config.{config_setting.capitalize()}Config'
+    config_module = f"config.{config_setting.capitalize()}Config"
     app.config.from_object(config_module)
-    
+
     # Initialise LoginManager
     login_manager.init_app(app)
 
     # Initialise Bcrypt extension
     _bcrypt.init_app(app)
 
-    # Initialise the database 
+    # Initialise the database
     db.init_app(app)
 
     with app.app_context():
@@ -32,15 +33,16 @@ def create_app(config_setting):
         app.register_blueprint(auth_bp)
         app.register_blueprint(main_bp)
 
-        db.create_all() 
+        db.create_all()
 
-        login_manager.login_view = 'auth.login'
+        login_manager.login_view = "auth.login"
 
         @login_manager.user_loader
         def load_user(user_id):
             return User.query.get(int(user_id))
 
-        @app.route('/', methods=['GET'])
+        @app.route("/", methods=["GET"])
         def hello():
-            return render_template('hello.html')
+            return render_template("hello.html")
+
     return app

@@ -1,0 +1,7 @@
+{% extends "main/create.html" %}
+
+{% block header %}
+{% block title %}<h1 class="title">Edit post</h1>{% endblock %}
+{% endblock %}
+
+{% block form_action %}{{ url_for('main.edit_post', slug=slug) }}{% endblock %}

@@ -19,7 +19,7 @@
                     <div id="navbarMenuHeroA" class="navbar-menu">
                         <div class="navbar-brand">
                             <h1 class="title is-1">
-                               <a href="{{ url_for('hello') }}">Blog</a> 
+                                <a href="{{ url_for('hello') }}">Blog</a>
                             </h1>
                         </div>
                         <div class="navbar-end">
@@ -33,7 +33,12 @@
                             {% endif %}
                             {% if current_user.is_authenticated %}
                             <a href="{{ url_for('main.create_post') }}" class="navbar-item">
-                                Create A Post
+                                Create Post
+                            </a>
+                            {% endif %}
+                            {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('main.drafts') }}" class="navbar-item">
+                                Drafts
                             </a>
                             {% endif %}
                             {% if current_user.is_authenticated %}

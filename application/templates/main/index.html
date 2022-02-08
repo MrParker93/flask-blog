@@ -2,30 +2,33 @@
 
 {% block title %}Home{% endblock %}
 
-{% block content %}
+{% block header %}
 <h1 class="title">
     Welcome!
 </h1>
+{% endblock %}
+
+{% block content %}
 <h2 class="subtitle">
     {% if not current_user.is_authenticated %}
-        Create your first blog post
+    Create your first blog post, <a href="{{ url_for('auth.register') }}">click here!</a>
     {% endif %}
 </h2>
-    {% for post in posts %}
-        <div class="card">
-            <header class="card-header">
-                <h2 class="card-header-title">
-                    {{ post.title }}
-                </h2>
-            </header>
-            <div class="card-content">
-                <div class="content">
-                    <p>{{ post.content }}</p>
-                </div>
-                <footer class="card-footer">
-                    <a href="#" class="card-footer-item">Read</a>
-                </footer>
-            </div>
+{% for posts in post %}
+<div class="card">
+    <header class="card-header">
+        <h2 class="card-header-title">
+            {{ posts.title }}
+        </h2>
+    </header>
+    <div class="card-content">
+        <div class="content">
+            <p>{{ posts.content }}</p>
         </div>
-    {% endfor %}
+        <footer class="card-footer">
+            <a href="#" class="card-footer-item">Read</a>
+        </footer>
+    </div>
+</div>
+{% endfor %}
 {% endblock %}

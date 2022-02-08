@@ -24,13 +24,14 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 # Create database tables
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'
-    id = db.Column('id', db.Integer, primary_key=True)
-    username = db.Column('username', db.String(30), unique=True, nullable=False)
-    _password = db.Column('password', db.Text, nullable=False)
-    created = db.Column('created', db.DateTime, nullable=False, default=datetime.utcnow)
-    posts = db.relationship('Post', back_populates='user',
-                cascade='all, delete, delete-orphan')
+    __tablename__ = "users"
+    id = db.Column("id", db.Integer, primary_key=True)
+    username = db.Column("username", db.String(30), unique=True, nullable=False)
+    _password = db.Column("password", db.Text, nullable=False)
+    created = db.Column("created", db.DateTime, nullable=False, default=datetime.utcnow)
+    posts = db.relationship(
+        "Post", back_populates="user", cascade="all, delete, delete-orphan"
+    )
 
     @hybrid_property
     def password(self):
@@ -50,8 +51,12 @@ class User(UserMixin, db.Model):
         self._password = bc.generate_password_hash(password, rounds=12)
 
     def __repr__(self):
-        return '<User(id="%d", username="%s", password="%s", posts="%s")>' %\
-                 (self.id, self.username, self.password, self.posts)
+        return '<User(id="%d", username="%s", password="%s", posts="%s")>' % (
+            self.id,
+            self.username,
+            self.password,
+            self.posts,
+        )
 
     def verify_password(self, password) -> bool:
         """
@@ -84,20 +89,26 @@ class User(UserMixin, db.Model):
 
 
 class Post(db.Model):
-    __tablename__ = 'posts'
-    id = db.Column('id', db.Integer, primary_key=True)
-    title = db.Column('title', db.String(80), nullable=False)
-    _slug = db.Column('slug', db.String(80), unique=True)
-    content = db.Column('content', db.Text, nullable=False)
-    published = db.Column('published', db.Boolean, index=True)
-    created = db.Column('created', db.DateTime, nullable=False,
-                    default=datetime.utcnow, index=True)
-    user_id = db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
-    user = db.relationship('User', back_populates='posts')
+    __tablename__ = "posts"
+    id = db.Column("id", db.Integer, primary_key=True)
+    title = db.Column("title", db.String(80), nullable=False)
+    _slug = db.Column("slug", db.String(80), unique=True)
+    content = db.Column("content", db.Text, nullable=False)
+    published = db.Column("published", db.Boolean, index=True)
+    created = db.Column(
+        "created", db.DateTime, nullable=False, default=datetime.utcnow, index=True
+    )
+    user_id = db.Column("user_id", db.Integer, db.ForeignKey("users.id"))
+    user = db.relationship("User", back_populates="posts")
 
     def __repr__(self):
-        return '<Post(id="%d", title="%s", slug="%s", content="%s", user_id="%d")>' \
-            % (self.id, self.title, self.slug, self.content, self.user_id)
+        return '<Post(id="%d", title="%s", slug="%s", content="%s", user_id="%d")>' % (
+            self.id,
+            self.title,
+            self.slug,
+            self.content,
+            self.user_id,
+        )
 
     def publish(self, *args, **kwargs):
         """
@@ -105,7 +116,7 @@ class Post(db.Model):
         the post else, save it as a draft to be published.
         """
         pass
-    
+
     @hybrid_property
     def slug(self):
         return self._slug
@@ -113,21 +124,23 @@ class Post(db.Model):
     @slug.setter
     def slug(self, *args, **kwargs):
         """Generate a URL-friendly representation of the post title."""
-        self._slug = re.sub(r'[^\w]+', '-', self.title.lower()).strip('-')
-        
+        self._slug = re.sub(r"[^\w]+", "-", self.title.lower()).strip("-")
+
     @classmethod
     def published_posts(cls):
         """
-        Searches through all posts of current user and displays all
-        published posts."""
-        pass
+        Searches through all posts of current user and returns all
+        published posts as Query object.
+        """
+        return Post.query.filter(Post.published == True)
 
     @classmethod
     def drafted_posts(cls):
         """
-        Searches through all posts of current user and displays all
-        drafted posts."""
-        pass
+        Searches through all posts of current user and returns all
+        drafted posts as Query object.
+        """
+        return Post.query.filter(Post.published == False)
 
     @classmethod
     def search_posts(cls, query):
@@ -139,7 +152,7 @@ class Post(db.Model):
 
 # class Comment(db.Model):
 #     __tablename__ = 'comments'
-#     user_id = db.Column(db.Integer, 
+#     user_id = db.Column(db.Integer,
 #                         db.ForeignKey('users.id',
 #                                        ondelete='CASCADE',
 #                                        onupdate='CASCADE'),

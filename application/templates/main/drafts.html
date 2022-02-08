@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Drafts{% endblock %}
+
+{% block header %}
+<h1 class="title">Drafted Posts</h1>
+{% endblock %}
+
+{% block content %}
+<div class="columns">
+    {% for posts in post %}
+    <div class="column">
+        <div class="card">
+            <header class="card-header">
+                <h2 class="card-header-title">
+                    {{ posts.title }}
+                </h2>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <p>{{ posts.content }}</p>
+                    <br>
+                    <p>Posted by {{ current_user.username.capitalize() }} on {{ posts.created.strftime('%d/%m/%Y')}}</p>
+                </div>
+                <footer class="card-footer">
+                    <a href="{{ url_for('main.edit_post', slug=posts.slug) }}" class="card-footer-item">Edit</a>
+                    <a href="{{ url_for('main.post', slug=posts.slug) }}" class="card-footer-item">Post</a>
+                    <a href="{{ url_for('main.delete') }}" class="card-footer-item">Delete</a>
+                </footer>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
