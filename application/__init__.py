@@ -2,11 +2,13 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, render_template, redirect
+from micawber.cache import Cache
+from micawber import bootstrap_basic
 
 db = SQLAlchemy()
 _bcrypt = Bcrypt()
 login_manager = LoginManager()
-
+oembed_providers = bootstrap_basic(Cache)
 
 def create_app(config_setting):
     """Construct the core application."""

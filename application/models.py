@@ -1,9 +1,14 @@
 import re
-from application import db
+from flask import Markup, current_app
+from application import db, oembed_providers
 from datetime import datetime
 from application import _bcrypt as bc
 from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
+from markdown import markdown
+from markdown.extensions.codehilite import CodeHiliteExtension
+from markdown.extensions.extra import ExtraExtension
+from micawber import parse_html
 
 # post_comments = Table('comments', db.metadata,
 #                 db.Column('user_id',
@@ -116,6 +121,23 @@ class Post(db.Model):
         the post else, save it as a draft to be published.
         """
         pass
+    
+    @property
+    def html_content(self):
+        """
+        Generate HTML representation of the markdown-formatted blog entry,
+        and also convert any media URLs into rich media objects such as video
+        players or images.
+        """
+        hilite = CodeHiliteExtension(linenums=False, css_class='highlight')
+        extras = ExtraExtension()
+        markdown_content = markdown(self.content, extensions=[hilite, extras])
+        oembed_content = parse_html(
+            markdown_content,
+            oembed_providers,
+            urlize_all=True,
+            maxwidth=current_app.config['SITE_WIDTH'])
+        return Markup(oembed_content)
 
     @hybrid_property
     def slug(self):
@@ -141,13 +163,19 @@ class Post(db.Model):
         drafted posts as Query object.
         """
         return Post.query.filter(Post.published == False)
-
+    
     @classmethod
     def search_posts(cls, query):
         """
         Query the post table for all posts matching the requested search
-        query then display all posts in the search result"""
-        pass
+        query then display all posts in the search result
+        """
+        words = [word.strip() for word in query.split() if word.strip()]
+        search = ' '.join(words)
+        published_posts = Post.published_posts()
+        return published_posts.filter(Post.title.match(search))
+
+        
 
 
 # class Comment(db.Model):

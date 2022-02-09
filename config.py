@@ -14,7 +14,7 @@ class Config:
     TESTING = False
     SECRET_KEY = os.getenv("SECRET_KEY")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
+    SITE_WIDTH = 800
 
 class ProductionConfig(Config):
     """Production configuration"""

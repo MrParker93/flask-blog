@@ -15,20 +15,30 @@
     {% endif %}
 </h2>
 {% for posts in post %}
-<div class="card">
-    <header class="card-header">
-        <h2 class="card-header-title">
-            {{ posts.title }}
-        </h2>
-    </header>
-    <div class="card-content">
-        <div class="content">
-            <p>{{ posts.content }}</p>
+    {% if posts.published %}
+        <div class="box has-text-left">
+            <h1 class="is-size-1 title has-text-dark">
+                <a href="{{ url_for('main.post', slug=posts.slug) }}">
+                    {{ posts.title }}
+                </a>
+            </h1>  
+            <p class="subtitle has-text-dark has-text-weight-light is-italic">
+                Created at {{ posts.created.strftime('%d/%m/%Y')}} by {{ posts.user.username }}
+            </p>
+            <hr>
         </div>
-        <footer class="card-footer">
-            <a href="#" class="card-footer-item">Read</a>
-        </footer>
-    </div>
-</div>
+    {% endif %}
 {% endfor %}
 {% endblock %}
+<!-- <div class="column">
+    <div class="card">
+        <div class="card-content">
+            <div class="content">
+                <p class="title ">{{ posts.title }}</p>
+            </div>
+            <footer class="card-footer">
+                <a href="#" class="card-footer-item">Read</a>
+            </footer>
+        </div>
+    </div>
+</div> -->

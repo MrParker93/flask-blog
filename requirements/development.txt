@@ -1,3 +1,7 @@
 python-dotenv
 Flask-SQLAlchemy
 flask-bcrypt
+flask-login
+markdown
+micawber
+beautifulsoup4
