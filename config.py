@@ -29,7 +29,7 @@ class DevelopmentConfig(Config):
     DATABASE = "blog.db"
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_RECORD_QUERIES = True
-    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI") + DATABASE
+    SQLALCHEMY_DATABASE_URI = (os.getenv("SQLALCHEMY_DATABASE_URI") + DATABASE)
 
 
 class TestingConfig(Config):

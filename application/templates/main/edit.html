@@ -5,3 +5,12 @@
 {% endblock %}
 
 {% block form_action %}{{ url_for('main.edit_post', slug=slug) }}{% endblock %}
+
+{% block button %}
+    <div class="column">
+        <button class="button is-info is-medium is-fullwidth">
+            <a href="{{ url_for('main.delete_post', slug=slug) }}">
+                Delete
+            </a>
+        </button>
+    </div>

@@ -56,15 +56,15 @@ def login():
         if username and password:
 
             # Query the users table and checks if username exists
-            user = User.query.filter_by(username=username).first_or_404(
-                description=f'Account with username: {username} not found.')
+            user = User.query.filter_by(username=username).first()
 
-            if user.verify_password(password):
+            if user is None:
+                flash('Incorrect username or password', 'danger')
+                
+            elif user.verify_password(password):
                 flash('Successfully logged in.', 'success')
                 login_user(user, remember=remember_session)
                 return redirect(url_for('main.profile'))
-            else:
-                flash('Incorrect username or password', 'danger')
 
         elif not username and password:
             flash('Missing field: Username', 'danger')

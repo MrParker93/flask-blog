@@ -1,6 +1,6 @@
 import re
 from flask import Markup, current_app
-from application import db, oembed_providers
+from application import db, oembed_providers, _search
 from datetime import datetime
 from application import _bcrypt as bc
 from flask_login import UserMixin
@@ -10,26 +10,11 @@ from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.extra import ExtraExtension
 from micawber import parse_html
 
-# post_comments = Table('comments', db.metadata,
-#                 db.Column('user_id',
-#                           db.Integer,
-#                           db.ForeignKey('users.id',
-#                                         ondelete='CASCADE',
-#                                         onupdate='CASCADE'),
-#                           primary_key=True
-#                     ),
-#                 db.Column('post_id',
-#                           db.Integer,
-#                           db.ForeignKey('posts.id',
-#                                         ondelete='CASCADE',
-#                                         onupdate='CASCADE'),
-#                           primary_key=True
-#                     ))
-
 
 # Create database tables
 class User(UserMixin, db.Model):
     __tablename__ = "users"
+    __searchable__ = ['username']
     id = db.Column("id", db.Integer, primary_key=True)
     username = db.Column("username", db.String(30), unique=True, nullable=False)
     _password = db.Column("password", db.Text, nullable=False)
@@ -95,6 +80,7 @@ class User(UserMixin, db.Model):
 
 class Post(db.Model):
     __tablename__ = "posts"
+    __searchable__ = ['title', 'content']
     id = db.Column("id", db.Integer, primary_key=True)
     title = db.Column("title", db.String(80), nullable=False)
     _slug = db.Column("slug", db.String(80), unique=True)
@@ -114,13 +100,6 @@ class Post(db.Model):
             self.content,
             self.user_id,
         )
-
-    def publish(self, *args, **kwargs):
-        """
-        Checks the `post.published` flag is `True` and publishes
-        the post else, save it as a draft to be published.
-        """
-        pass
     
     @property
     def html_content(self):
@@ -172,11 +151,14 @@ class Post(db.Model):
         """
         words = [word.strip() for word in query.split() if word.strip()]
         search = ' '.join(words)
-        published_posts = Post.published_posts()
-        return published_posts.filter(Post.title.match(search))
+        return Post.published_posts().order_by(Post.created.desc()).msearch(search, fields=['title'], limit=20)
 
-        
-
+    @classmethod
+    def delete_post(cls, slug):
+        """
+        Deletes a post from users account.
+        """
+        return Post.query.filter(Post.slug == slug).first()
 
 # class Comment(db.Model):
 #     __tablename__ = 'comments'

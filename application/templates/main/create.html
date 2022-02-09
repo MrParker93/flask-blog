@@ -20,7 +20,7 @@
 {% endblock %}
 
 {% block header %}
-<h1 class="title">{% block title %}Create A Post{% endblock %}</h1>
+<h1 class="is-size-1 title">{% block title %}Create A Post{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
@@ -54,6 +54,7 @@
                     <div class="column">
                         <button class="button is-block is-info is-medium is-fullwidth">Create</button>
                     </div>
+                    {% block button %}{% endblock %}
                     <div class="column">
                         <button class="button is-block is-info is-medium is-fullwidth">
                            <a href="{{ url_for('main.index') }}">Cancel</a>

@@ -2,3 +2,26 @@
 
 {% block title %}{{ post.title }}{% endblock %}
 
+{% block navbar %}
+    <a href="{{ url_for('main.edit_post', slug=post.slug) }}" class="navbar-item">
+        Edit Post
+    </a>
+    <a href="{{ url_for('main.delete_post', slug=post.slug) }}" class="navbar-item">
+        Delete Post
+    </a>
+{% endblock %}
+
+{% block content %}
+    <div class="box has-text-left">
+        <h1 class="is-size-1 title has-text-dark">
+            <a href="{{ url_for('main.post', slug=post.slug) }}">
+                {{ post.title }}
+            </a>
+        </h1>  
+        <p class="subtitle has-text-dark has-text-weight-light is-italic">
+            Created at {{ post.created.strftime('%d/%m/%Y')}} by {{ post.user.username }}
+        </p>
+        <hr>
+        {{ post.html_content }}
+    </div>
+{% endblock %}
