@@ -1,6 +1,6 @@
 import re
 from flask import Markup, current_app
-from application import db, oembed_providers, _search
+from application import db, oembed_providers
 from datetime import datetime
 from application import _bcrypt as bc
 from flask_login import UserMixin
@@ -9,6 +9,7 @@ from markdown import markdown
 from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.extra import ExtraExtension
 from micawber import parse_html
+
 
 
 # Create database tables

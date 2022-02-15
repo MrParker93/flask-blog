@@ -2,10 +2,41 @@
 
 {% block title %}Home{% endblock %}
 
+{% block head %}
+<style>
+    .notification {
+        animation-name: fadein;
+        animation-duration: 1s;
+    }
+
+    @keyframes fadein {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block header %}
 <h1 class="title">
     Welcome!
 </h1>
+{% endblock %}
+
+{% block message %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <p data-close="self" role="alert" class="notification is-{{ category }} has-text-white has-text-centered" id="message">
+                {{ message }}
+            </p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 {% endblock %}
 
 {% block content %}
@@ -29,4 +60,9 @@
         </div>
     {% endif %}
 {% endfor %}
+{% endblock %}
+
+{% block script %}
+<script
+    type="text/javascript">window.setTimeout("document.getElementById('message').style.display='none';", 3000); </script>
 {% endblock %}

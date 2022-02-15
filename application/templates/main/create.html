@@ -27,7 +27,7 @@
 <div class="column is-6  is-offset-3 is-vcentered">
     {% with messages = get_flashed_messages(with_categories=true) %}
     <div class="box">
-        <form method="POST" action="{% block form_action %}{{ url_for('main.create_post') }}{% endblock %}">
+        <form method="post" action="{{ url_for('main.create_post') }}">
             {% if messages %}
             {% for category, message in messages %}
             <p data-close="self" role="alert" class="notification is-{{ category }} has-text-white " id="message">
@@ -54,7 +54,6 @@
                     <div class="column">
                         <button class="button is-block is-info is-medium is-fullwidth">Create</button>
                     </div>
-                    {% block button %}{% endblock %}
                     <div class="column">
                         <button class="button is-block is-info is-medium is-fullwidth">
                            <a href="{{ url_for('main.index') }}">Cancel</a>
@@ -75,6 +74,7 @@
     </div>
     {% endwith %}
 </div>
+
 {% endblock %}
 {% block script %}
 <script

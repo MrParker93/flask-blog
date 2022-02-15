@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block title %}{{ post.title }}{% endblock %}
-
 {% block navbar %}
     <a href="{{ url_for('main.edit_post', slug=post.slug) }}" class="navbar-item">
         Edit Post

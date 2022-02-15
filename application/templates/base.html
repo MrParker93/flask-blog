@@ -32,7 +32,7 @@
                                 Home
                             </a>
                             {% if current_user.is_authenticated %}
-                            <a href="{{ url_for('main.profile') }}" class="navbar-item">
+                            <a href="{{ url_for('main.profile', user_id=current_user.id) }}" class="navbar-item">
                                 Profile
                             </a>
                             {% endif %}
@@ -77,7 +77,7 @@
                 </div>
             </nav>
         </div>
-
+        {% block message %}{% endblock %}
         <div class="hero-body">
             <div class="container has-text-centered">
                 <header>

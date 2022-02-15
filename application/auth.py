@@ -1,10 +1,9 @@
-import functools
 from .models import db, User
 from sqlalchemy.exc import IntegrityError
 
 from flask_login import login_user, logout_user, login_required
 from flask import Blueprint, flash, redirect, render_template, request,\
-            session, url_for, make_response, g
+             url_for
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -60,7 +59,6 @@ def login():
 
             if user is None:
                 flash('Incorrect username or password', 'danger')
-                
             elif user.verify_password(password):
                 flash('Successfully logged in.', 'success')
                 login_user(user, remember=remember_session)

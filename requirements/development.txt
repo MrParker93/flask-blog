@@ -5,3 +5,4 @@ flask-login
 markdown
 micawber
 beautifulsoup4
+flask-msearch
