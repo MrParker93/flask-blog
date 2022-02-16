@@ -15,7 +15,6 @@ from flask import (
 
 bp = Blueprint('main', __name__, url_prefix='/main')
 
-
 @bp.route('/')
 def index():
     search_query = request.args.get('query')
